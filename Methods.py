@@ -7,8 +7,8 @@ def menuOptions():
     print("Menu Options:\n")
 
 def helpMenu():
-    #Display examples of acceptable quires
-    print("Example of Acceptable Quires:\n")
+    #Display examples of acceptable queries
+    print("Example of Acceptable Queries:\n")
 
 
 #Function reads Ariplane and all data in Airplane.txt file
