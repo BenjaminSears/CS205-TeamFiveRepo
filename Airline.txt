@@ -1,4 +1,4 @@
-Airline Id,Name,ICAO
+Airline ID,Name,ICAO
 1,Private flight,N/A
 2,135 Airways,GNL
 3,1Time Airline,RNX
