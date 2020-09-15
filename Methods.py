@@ -13,7 +13,7 @@ def helpMenu():
 
 #Function reads Ariplane and all data in Airplane.txt file
 def airplaneCSV():
-    with open('Airline.txt') as csv_file:
+    with open('Airline.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
         for row in csv_reader:
