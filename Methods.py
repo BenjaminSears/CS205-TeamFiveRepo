@@ -18,21 +18,25 @@ def menuOptions():
         loadData()
 
     # Parse user's input into a list, seek out keywords
-    wordList = [None] * 10
-    spaceIndex = 0
-    j = 0
-    for i in range(len(userInput)):
-        if userInput[i] == " ":
-            wordList[j] = userInput[spaceIndex:i]
-            spaceIndex = i + 1
-            j = j + 1
 
-    wordList[j] = userInput[spaceIndex:len(userInput)]
+    # wordList contains what the user is 'seeking' at index 0, and what they are seeking FOR at index 1
+    # Each index is decided based on where the user's comma is place
+    # Example input: [Airline ID, 135 Airways]
+    # The user is SEEKING Airline ID FOR 135 Airways. Should return 1 as per the Airline.csv
+    wordList = userInput.split(",")
+    for i in range(len(wordList)):
+        wordList[i] = wordList[i].strip()
 
     # Hard coded lookups at given indexes
+
+    inputIsFlightName = False
+    inputIsAirlineID = False
+    inputIsICAO = False
+
     # Find ICAO for a given input
     if wordList[0] == 'ICAO':
-        print()
+        if inputIsAirlineID:
+            getICAOByID()
 
     # Find Airline ID for a given input
     if wordList[0] == 'Airline' and wordList[1] == 'ID':
@@ -43,10 +47,8 @@ def menuOptions():
         print()
 
 def helpMenu():
-
     # Display examples of acceptable queries
     print("Help Menu\n")
-
 
 def loadData():
     # Load the data from either Route.txt or Airline.txt
