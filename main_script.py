@@ -91,8 +91,13 @@ def menuOptions():
         inputIsICAO = False
         print(parsedUserRequest)
         if len(parsedUserRequest) > 1:
-            if len(parsedUserRequest[1]) == 1:
-                inputIsAirlineID = True
+            if len(parsedUserRequest[1]) <= 3:
+                try:
+                    id = int(parsedUserRequest[1])
+                    inputIsAirlineID = True
+                except Error as e:
+                    break
+        
             if len(parsedUserRequest[1]) == 3:
                 print(parsedUserRequest[1])
                 inputIsICAO = True
