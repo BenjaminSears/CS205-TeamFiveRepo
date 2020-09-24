@@ -3,6 +3,7 @@ import pandas as pd
 from sqlite3 import Error
 import os.path
 from os import path
+
 def connect_to_database():
     conn = None
     try:
@@ -58,9 +59,10 @@ def main():
     database_file = "/Users/bensylvester/Desktop/bensylvester/Desktop/CS205-TeamFiveRepo/CS205_database.db"
     airline_csv = "/Users/bensylvester/Desktop/bensylvester/Desktop/CS205-TeamFiveRepo/Airline.csv"
     route_csv = "/Users/bensylvester/Desktop/bensylvester/Desktop/CS205-TeamFiveRepo/Route.csv"
+
     if path.exists(database_file):
-        print(execute_cursor_all_rows("SELECT * FROM airline"))
-        print(execute_cursor_all_rows("SELECT * FROM route"))
+        print(execute_cursor_all_rows("SELECT airline_id FROM airline WHERE name = 'Private flight'"))
+        #print(execute_cursor_all_rows("SELECT * FROM route"))
     else:
 
         airline_column_list = ['airline_id', 'name', 'icao']
