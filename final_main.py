@@ -29,6 +29,7 @@ def insert_values_to_table(table_name, csv_file, column_list):
                       'icao        VARCHAR)')
 
         if table_name == "route":
+            print("CREATING_TABLE")
             c.execute('CREATE TABLE IF NOT EXISTS ' + table_name +
                       '(route_id                INTEGER,'
                       'airline                  VARCHAR,'
@@ -67,10 +68,8 @@ def menuOptions():
     while userInput.upper() != 'Q':
         if userInput.upper() == 'HELP':
             helpMenu()
-
         if userInput.upper() == 'LOAD DATA':
             loadData()
-
         # Parse user's input into a list, seek out keywords
 
         # parsedUserRequest contains what the user is 'seeking' at index 0, and what they are seeking FOR at index 1
@@ -80,55 +79,39 @@ def menuOptions():
         parsedUserRequest = userInput.split(",")
         for i in range(len(parsedUserRequest)):
             parsedUserRequest[i] = parsedUserRequest[i].strip()
+        airline_column_list = ['airline_id', 'name', 'icao']
+        route_column_list = ['route_id', 'airline', 'airline_id', 'source_airport', 'source_airport_id',
+                             'destination_airport', 'destination_airport_id']
+        for i in range(len(parsedUserRequest)):
+            parsedUserRequest[i] = parsedUserRequest[i].strip()
 
-        # Hard coded lookups at given indexes
+        is_airline_query = False
+        is_route_query = False
+        if parsedUserRequest[0].lower() in airline_column_list and parsedUserRequest[1].lower() in airline_column_list:
+            is_airline_query = True
+        if parsedUserRequest[0].lower() in route_column_list and parsedUserRequest[1].lower() in route_column_list:
+            is_route_query = True
+        if len(parsedUserRequest) == 3:
+            if is_airline_query:
 
-        # Figure out what kind of lookup parsedUserRequest[1] is
-        inputIsFlightName = False
-        inputIsAirlineID = False
-        inputIsICAO = False
-        print(parsedUserRequest)
-        if len(parsedUserRequest) > 1:
-            if len(parsedUserRequest[1]) <= 3:
-                try:
-                    id = int(parsedUserRequest[1])
-                    inputIsAirlineID = True
-                except Error as e:
-                    break
-            if len(parsedUserRequest[1]) == 3:
-                print(parsedUserRequest[1])
-                inputIsICAO = True
-                print("TRUE")
-            if len(parsedUserRequest[1]) > 3:
-                inputIsFlightName = True
-        # Find ICAO for a given input
-        if parsedUserRequest[0].upper() == 'ICAO':
-            if inputIsAirlineID:
-                getICAOByID(parsedUserRequest[1])
-            if inputIsFlightName:
-                getICAOByName(parsedUserRequest[1])
+                if type(parsedUserRequest[2]) == str:
+                    sql = "SELECT " + parsedUserRequest[0] + " FROM airline WHERE " + parsedUserRequest[1] + "= '" + \
+                          parsedUserRequest[2].upper() + "'"
+                else:
+                    sql = "SELECT " + parsedUserRequest[0] + " FROM airline WHERE " + parsedUserRequest[1] + "= " + \
+                          parsedUserRequest[2]
 
-        # Find Airline ID for a given input
-        if parsedUserRequest[0] == 'Airline ID':
-            if inputIsFlightName:
-                getAirlineIDByName(parsedUserRequest[1])
-            if inputIsICAO:
-                getAirlineIDByICAO(parsedUserRequest[1])
+            if is_route_query:
+                if type(parsedUserRequest[2]) == str:
+                    sql = "SELECT " + parsedUserRequest[0] + " FROM route WHERE " + parsedUserRequest[1] + "= '" + \
+                          parsedUserRequest[2] + "'"
+                else:
+                    sql = "SELECT " + parsedUserRequest[0] + " FROM route WHERE " + parsedUserRequest[1] + "= " + \
+                          parsedUserRequest[2]
 
-        # Find Name for given input
-        if parsedUserRequest[0] == 'Name':
-            if inputIsICAO:
-                getFlightNameByICAO(parsedUserRequest[1])
-            if inputIsAirlineID:
-                getFlightNameByID(parsedUserRequest[1])
-
-        # Find Destination Airport ID for given input
-        if parsedUserRequest[0] == 'Destination Airport ID':
-            getDestinationAirportIDByDestinationAirport(parsedUserRequest[1])
-
-        # Find Destination Airport for given input
-        if parsedUserRequest[0] == 'Destination Airport':
-            getDestinationAirportByDestinationAirportID(parsedUserRequest[1])
+            print(sql)
+            values = (execute_cursor_all_rows(sql))
+            print(set(values))
 
 
         print("\nThanks for using the SQL interpreter! You may enter another request, or enter 'Q' to quit.\n"
@@ -166,74 +149,6 @@ def loadData():
         insert_values_to_table("route", route_csv, route_column_list)
 
         print("Data loaded\n")
-# Define methods for grabbing data from the airline dataset
-
-# Retrieve ICAO code based on Airline ID input
-def getICAOByID(pAirlineID):
-    sql = "SELECT icao FROM airline WHERE airline_id = " + pAirlineID
-    value = execute_cursor_all_rows(sql)
-    value_set = set(value)
-    print(value_set)
-
-# Retrieve ICAO code based on Flight Name input
-def getICAOByName(pFlightName):
-    sql = "SELECT icao FROM airline WHERE name = '" + pFlightName + "'"
-    print(sql)
-    value = execute_cursor_all_rows(sql)
-    value_set = set(value)
-    print(value_set)
-
-# Retrieve Airline ID based on ICAO input
-def getAirlineIDByICAO(pICAO):
-    sql = "SELECT airline_id FROM airline WHERE icao = " + pICAO
-    print(sql)
-    value = execute_cursor_all_rows(sql)
-    value_set = set(value)
-    print(value_set)
-
-
-# Retrieve Airline ID based on Flight Name input
-def getAirlineIDByName(pFlightName):
-    sql = "SELECT airline_id FROM airline WHERE name = '" + pFlightName + "'"
-    print(sql)
-    value = execute_cursor_all_rows(sql)
-    value_set = set(value)
-    print(value_set)
-
-
-# Retrieve Flight Name based on Airline ID input
-def getFlightNameByID(pAirlineID):
-    sql = "SELECT name FROM airline WHERE airline_id = " + pAirlineID
-    print(sql)
-    value = execute_cursor_all_rows(sql)
-    value_set = set(value)
-    print(value_set)
-
-
-# Retrieve Flight Name based on ICAO input
-def getFlightNameByICAO(pICAO):
-    sql = "SELECT name FROM airline WHERE icao = '" + pICAO + "'"
-    print(sql)
-    value = execute_cursor_all_rows(sql)
-    value_set = set(value)
-    print(value_set)
-
-# FROM ROUTE.CSV
-
-
-# Retrieve DestinationAirportID based in Destination Airport input
-def getDestinationAirportIDByDestinationAirport(pDestinationAirport):
-    sql = "SELECT destination FROM route WHERE destination_airport = '" + pDestinationAirport + "'"
-    print(sql)
-    value = execute_cursor_all_rows(sql)
-    value_set = set(value)
-    print(value_set)
-    print("Destination Airport ID retrieved by Destination Airport")
-
-
-# Retrieve DestinationAirport based in Destination AirportID input
-def getDestinationAirportByDestinationAirportID(pDestinationAirportID):
-    print("Destination Airport retrieved by Destination AirportID")
 
 def main():
 
