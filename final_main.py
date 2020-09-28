@@ -127,9 +127,9 @@ def helpMenu():
     userInput = ""
     while userInput != 'b':
         userInput = input("This is our help menu! Press 'b' to return to the main menu at any time. Below is our syntax for inputs.\n"
-                          "The first thing in a statement is what you are SEARCHING followed by a comma. After the comma"
-                          " comes the thing you are SEEKING IT FOR.\nExample, if I want the Airline ID for 135 Airways I would input:\n"
-                          "[Airline ID, 135 Airways]\nI am SEARCHING for the Airline ID, and I am SEEKING IT FOR 135 Airways\n")
+                          "The first input is what you are SEARCHING FOR, the second is what you are SEARCHING BY\n"
+                          "and the third input is the NAME of what you want to search by: \n"
+                          "[ICAO, Name, 135 Airways]\nI am SEARCHING for the ICAO, by flight name, for 135 Airways\n")
     menuOptions()
 
 
