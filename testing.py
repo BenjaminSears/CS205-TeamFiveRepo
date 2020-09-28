@@ -9,7 +9,7 @@ from os import path
 def connect_to_database():
     conn = None
     try:
-        conn = sqlite3.connect("/Users/bensylvester/Desktop/bensylvester/Desktop/CS205-TeamFiveRepo/CS205_testing.db")
+        conn = sqlite3.connect("/Users/bensylvester/Desktop/bensylvester/Desktop/CS205-TeamFiveRepo/CS205_data.db")
         return conn
 
     except Error as e:

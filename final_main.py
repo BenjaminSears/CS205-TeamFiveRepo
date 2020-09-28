@@ -95,8 +95,12 @@ def menuOptions():
             if is_airline_query:
 
                 if type(parsedUserRequest[2]) == str:
-                    sql = "SELECT " + parsedUserRequest[0] + " FROM airline WHERE " + parsedUserRequest[1] + "= '" + \
-                          parsedUserRequest[2].upper() + "'"
+                    if len(parsedUserRequest[2]) >= 3:
+                        sql = "SELECT " + parsedUserRequest[0] + " FROM airline WHERE " + parsedUserRequest[1] + "= '" + \
+                              parsedUserRequest[2] + "'"
+                    else:
+                        sql = "SELECT " + parsedUserRequest[0] + " FROM airline WHERE " + parsedUserRequest[1] + "= '" + \
+                              parsedUserRequest[2].upper() + "'"
                 else:
                     sql = "SELECT " + parsedUserRequest[0] + " FROM airline WHERE " + parsedUserRequest[1] + "= " + \
                           parsedUserRequest[2]
@@ -104,14 +108,19 @@ def menuOptions():
             if is_route_query:
                 if type(parsedUserRequest[2]) == str:
                     sql = "SELECT " + parsedUserRequest[0] + " FROM route WHERE " + parsedUserRequest[1] + "= '" + \
-                          parsedUserRequest[2] + "'"
+                          parsedUserRequest[2].upper() + "'"
                 else:
                     sql = "SELECT " + parsedUserRequest[0] + " FROM route WHERE " + parsedUserRequest[1] + "= " + \
                           parsedUserRequest[2]
 
             print(sql)
-            values = (execute_cursor_all_rows(sql))
-            print(set(values))
+            values = set((execute_cursor_all_rows(sql)))
+            print("Here is the data you have requested:")
+            print("Showing the " + parsedUserRequest[0] + " where " + parsedUserRequest[1] + " is equal to " + parsedUserRequest[2] )
+            for x in values:
+                for data in x:
+                    if data is not None:
+                        print(parsedUserRequest[0] + ": " + str(data))
 
 
         print("\nThanks for using the SQL interpreter! You may enter another request, or enter 'Q' to quit.\n"
@@ -154,5 +163,9 @@ def loadData():
 def main():
 
     menuOptions()
+    """
+    select name of airline where 
+    """
+    #print(execute_cursor_all_rows("SELECT name FROM airline INNER JOIN route ON route.airline_id = airline.airline_id"))
 
 main()
