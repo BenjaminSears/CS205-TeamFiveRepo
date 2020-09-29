@@ -137,23 +137,48 @@ def menuOptions():
             #name, soure_airport_ KZN
 
             #source_airport, icao, GNL
-            if is_join_query:
+            if is_join_query and not is_route_query:
                 if parsedUserRequest[0] in airline_column_list:
-                    sql = "SELECT airline." + parsedUserRequest[0] + " \nFROM airline \nINNER JOIN route ON route.airline_id = airline.airline_id "
-                    sql += "AND "
-                    if parsedUserRequest[1] in route_column_list and parsedUserRequest[1] not in airline_column_list:
-                        sql += "route." + parsedUserRequest[1] + " = '" + parsedUserRequest[2] + "'"
+                    # if its a string we need qoutes
+                    if type(parsedUserRequest[2]) == str:
+                        # if its greater than size 3, we dont make it uppercase
+                        if len(parsedUserRequest[2]) > 3:
+                            sql = "SELECT airline." + parsedUserRequest[0] + " \nFROM airline \nINNER JOIN route ON route.airline_id = airline.airline_id "
+                            sql += "AND "
+                            if parsedUserRequest[1] in route_column_list and parsedUserRequest[1] not in airline_column_list:
+                                sql += "route." + parsedUserRequest[1] + " = '" + parsedUserRequest[2] + "'"
+                        # if its equal to size 3 then its an ICAO or code that neeeds to be capitalized
+                        if len(parsedUserRequest[2]) == 3:
+                            sql = "SELECT airline." + parsedUserRequest[
+                                0] + " \nFROM airline \nINNER JOIN route ON route.airline_id = airline.airline_id "
+                            sql += "AND "
+                            if parsedUserRequest[1] in route_column_list and parsedUserRequest[
+                                1] not in airline_column_list:
+                                sql += "route." + parsedUserRequest[1] + " = '" + parsedUserRequest[2].upper() + "'"
+                    else:
+                        sql = "SELECT airline." + parsedUserRequest[0] + " \nFROM airline \nINNER JOIN route ON route.airline_id = airline.airline_id "
+                        sql += "AND "
+                        if parsedUserRequest[1] in route_column_list and parsedUserRequest[1] not in airline_column_list:
+                            sql += "route." + parsedUserRequest[1] + " = " + parsedUserRequest[2]
                 if parsedUserRequest[0] in route_column_list:
-                    sql = "SELECT route." + parsedUserRequest[0] + " \nFROM airline \nINNER JOIN route ON route.airline_id = airline.airline_id "
-                    sql += "AND "
-                    if parsedUserRequest[1] in airline_column_list and parsedUserRequest[1] not in route_column_list:
-                        sql += "airline." + parsedUserRequest[1] + " = '" + parsedUserRequest[2] + "'"
+                    if type(parsedUserRequest[2]) == str:
+                        if len(parsedUserRequest[2]) > 3:
+                            sql = "SELECT route." + parsedUserRequest[0] + " \nFROM airline \nINNER JOIN route ON route.airline_id = airline.airline_id "
+                            sql += "AND "
+                            if parsedUserRequest[1] in airline_column_list and parsedUserRequest[1] not in route_column_list:
+                                sql += "airline." + parsedUserRequest[1] + " = '" + parsedUserRequest[2] + "'"
+                        if len(parsedUserRequest[2]) == 3:
+                            sql = "SELECT route." + parsedUserRequest[0] + " \nFROM airline \nINNER JOIN route ON route.airline_id = airline.airline_id "
+                            sql += "AND "
+                            if parsedUserRequest[1] in airline_column_list and parsedUserRequest[1] not in route_column_list:
+                                sql += "airline." + parsedUserRequest[1] + " = '" + parsedUserRequest[2].upper() + "'"
+                    else:
+                        sql = "SELECT route." + parsedUserRequest[0] + " \nFROM airline \nINNER JOIN route ON route.airline_id = airline.airline_id "
+                        sql += "AND "
+                        if parsedUserRequest[1] in airline_column_list and parsedUserRequest[1] not in route_column_list:
+                            sql += "airline." + parsedUserRequest[1] + " = " + parsedUserRequest[2].upper()
 
-
-
-
-
-
+        print(sql)
         values = set((execute_cursor_all_rows(sql)))
         if len(values) == 0:
             print("You have entered either an invalid request, or none of the data meets the critera you inputted. Please try again")
@@ -209,6 +234,7 @@ def loadData():
     success_load = True
     if path.exists(DATABASE_FILE):
         print("Data has already been loaded")
+        return True
 
     else:
 
