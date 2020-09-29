@@ -4,10 +4,15 @@ from sqlite3 import Error
 import os.path
 from os import path
 
+# global veriables
+DATABASE_FILE = "/Users/bensylvester/Desktop/bensylvester/Desktop/CS205-TeamFiveRepo/CS205_database.db"
+AIRLINE_CSV_FILE = "/Users/bensylvester/Desktop/bensylvester/Desktop/CS205-TeamFiveRepo/Airline.csv"
+ROUTE_CSV_FILE = "/Users/bensylvester/Desktop/bensylvester/Desktop/CS205-TeamFiveRepo/Route.csv"
+
 def connect_to_database():
     conn = None
     try:
-        conn = sqlite3.connect("/Users/bensylvester/Desktop/bensylvester/Desktop/CS205-TeamFiveRepo/CS205_testing.db")
+        conn = sqlite3.connect(DATABASE_FILE)
         return conn
 
     except Error as e:
@@ -59,10 +64,10 @@ def execute_cursor_all_rows(sql_statement):
 def menuOptions():
     # Display options/give user directions
     print("Welcome to the SQL interpreter! If the data is loaded you may input a request. "
-          "Or, if it is not loaded you may enter 'Load Data'.\nYou may input 'Help' for our help menu"
+          "Your database will be loaded if it does not already exist'.\nYou may input 'Help' for our help menu"
           "If your session is complete, please enter 'Q' to exit the interface")
-
-    # Prompt user for input
+    loadData()
+     # Prompt user for input
     userInput = input("Please input your request:\n")
     # Check for hard coded inputs 'Help' and 'Load Data'
     while userInput.upper() != 'Q':
@@ -87,10 +92,15 @@ def menuOptions():
 
         is_airline_query = False
         is_route_query = False
+        is_join_query = False
         if parsedUserRequest[0].lower() in airline_column_list and parsedUserRequest[1].lower() in airline_column_list:
             is_airline_query = True
         if parsedUserRequest[0].lower() in route_column_list and parsedUserRequest[1].lower() in route_column_list:
             is_route_query = True
+        if parsedUserRequest[0].lower() in airline_column_list and parsedUserRequest[1].lower() not in airline_column_list:
+            is_join_query = True
+        if parsedUserRequest[0].lower() in route_column_list and parsedUserRequest[1].lower() not in route_column_list:
+            is_join_query = True
         if len(parsedUserRequest) == 3:
             if is_airline_query:
 
@@ -112,6 +122,25 @@ def menuOptions():
                 else:
                     sql = "SELECT " + parsedUserRequest[0] + " FROM route WHERE " + parsedUserRequest[1] + "= " + \
                           parsedUserRequest[2]
+            #name, soure_airport_ KZN
+
+            #source_airport, icao, GNL
+            if is_join_query:
+                if parsedUserRequest[0] in airline_column_list:
+                    sql = "SELECT airline." + parsedUserRequest[0] + " \nFROM airline \nINNER JOIN route ON route.airline_id = airline.airline_id "
+                    sql += "AND "
+                    if parsedUserRequest[1] in route_column_list and parsedUserRequest[1] not in airline_column_list:
+                        sql += "route." + parsedUserRequest[1] + " = '" + parsedUserRequest[2] + "'"
+                if parsedUserRequest[0] in route_column_list:
+                    sql = "SELECT route." + parsedUserRequest[0] + " \nFROM airline \nINNER JOIN route ON route.airline_id = airline.airline_id "
+                    sql += "AND "
+                    if parsedUserRequest[1] in airline_column_list and parsedUserRequest[1] not in route_column_list:
+                        sql += "airline." + parsedUserRequest[1] + " = '" + parsedUserRequest[2] + "'"
+
+
+
+
+
 
             print(sql)
             values = set((execute_cursor_all_rows(sql)))
@@ -145,27 +174,23 @@ def helpMenu():
 
 def loadData():
     # Load the data from either Route.csv or Airline.csv
-    database_file = "/Users/bensylvester/Desktop/bensylvester/Desktop/CS205-TeamFiveRepo/CS205_database.db"
-    airline_csv = "/Users/bensylvester/Desktop/bensylvester/Desktop/CS205-TeamFiveRepo/Airline.csv"
-    route_csv = "/Users/bensylvester/Desktop/bensylvester/Desktop/CS205-TeamFiveRepo/Route.csv"
-    if path.exists(database_file):
+
+    if path.exists(DATABASE_FILE):
         print("Data has already been loaded")
+
     else:
 
         airline_column_list = ['airline_id', 'name', 'icao']
         route_column_list = ['route_id', 'airline', 'airline_id', 'source_airport', 'source_airport_id',
                              'destination_airport', 'destination_airport_id']
-        insert_values_to_table("airline", airline_csv, airline_column_list)
-        insert_values_to_table("route", route_csv, route_column_list)
+        insert_values_to_table("airline", AIRLINE_CSV_FILE, airline_column_list)
+        insert_values_to_table("route", ROUTE_CSV_FILE, route_column_list)
 
         print("Data loaded\n")
 
 def main():
 
     menuOptions()
-    """
-    select name of airline where 
-    """
-    #print(execute_cursor_all_rows("SELECT name FROM airline INNER JOIN route ON route.airline_id = airline.airline_id"))
+
 
 main()
