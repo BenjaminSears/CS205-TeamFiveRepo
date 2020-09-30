@@ -73,7 +73,7 @@ def execute_cursor_all_rows(sql_statement):
 def menuOptions():
     # Display options/give user directions
     print("Welcome to the SQL interpreter! If the data is loaded you may input a request. "
-          "Your database will be loaded if it does not already exist'.\nYou may input 'Help' for our help menu"
+          "Your database will be loaded if it does not already exist.\nYou may input 'Help' for our help menu"
           "\nIf your session is complete, please enter 'Q' to exit the interface"
           "\n\nREMINDER: please use the corresponding case (upper/lower) for the column the data is representing\n"
           "For example, ICAO codes should always be capitalized, and if you are searching for 'airline_id', make sure that is how you enter it as input\n")
@@ -180,7 +180,7 @@ def menuOptions():
                         if parsedUserRequest[1] in airline_column_list and parsedUserRequest[1] not in route_column_list:
                             sql += "airline." + parsedUserRequest[1] + " = " + parsedUserRequest[2].upper()
 
-        print(sql)
+        #print(sql)
         values = set((execute_cursor_all_rows(sql)))
         if len(values) == 0:
             print("You have entered either an invalid request, or none of the data meets the critera you inputted. Please try again")
