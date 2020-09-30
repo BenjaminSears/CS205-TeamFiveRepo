@@ -1,6 +1,6 @@
 import sqlite3
 import pandas as pd
-from sqlite3 import Error
+from sqlite3 import Error, OperationalError
 from os import path
 
 # global variables must be assigned values
@@ -119,7 +119,7 @@ def menuOptions():
             if is_airline_query:
 
                 if type(parsedUserRequest[2]) == str:
-                    if len(parsedUserRequest[2]) >= 3:
+                    if len(parsedUserRequest[2]) > 3:
                         sql = "SELECT " + parsedUserRequest[0] + " FROM airline WHERE " + parsedUserRequest[1] + "= '" + \
                               parsedUserRequest[2] + "'"
                     else:
@@ -154,8 +154,8 @@ def menuOptions():
                             sql = "SELECT airline." + parsedUserRequest[
                                 0] + " \nFROM airline \nINNER JOIN route ON route.airline_id = airline.airline_id "
                             sql += "AND "
-                            if parsedUserRequest[1] in route_column_list and parsedUserRequest[
-                                1] not in airline_column_list:
+                            print(parsedUserRequest[1] in route_column_list)
+                            if parsedUserRequest[1] in route_column_list and parsedUserRequest[1] not in airline_column_list:
                                 sql += "route." + parsedUserRequest[1] + " = '" + parsedUserRequest[2].upper() + "'"
                     else:
                         sql = "SELECT airline." + parsedUserRequest[0] + " \nFROM airline \nINNER JOIN route ON route.airline_id = airline.airline_id "
@@ -180,19 +180,20 @@ def menuOptions():
                         if parsedUserRequest[1] in airline_column_list and parsedUserRequest[1] not in route_column_list:
                             sql += "airline." + parsedUserRequest[1] + " = " + parsedUserRequest[2].upper()
 
-        #print(sql)
-        values = set((execute_cursor_all_rows(sql)))
-        if len(values) == 0:
-            print("You have entered either an invalid request, or none of the data meets the critera you inputted. Please try again")
-        else:
-            print("Here is the data you have requested:")
-            print("Showing the " + parsedUserRequest[0] + " where " + parsedUserRequest[1] + " is equal to " + parsedUserRequest[2] )
-            for x in values:
-                for data in x:
-                    if data is not None:
-                        print(parsedUserRequest[0] + ": " + str(data))
-
-
+        print(sql)
+        try:
+            values = set((execute_cursor_all_rows(sql)))
+            if len(values) == 0:
+                print("You have entered either an invalid request, or none of the data meets the critera you inputted. Please try again")
+            else:
+                print("Here is the data you have requested:")
+                print("Showing the " + parsedUserRequest[0] + " where " + parsedUserRequest[1] + " is equal to " + parsedUserRequest[2] )
+                for x in values:
+                    for data in x:
+                        if data is not None:
+                            print(parsedUserRequest[0] + ": " + str(data))
+        except OperationalError:
+            print("INVALID QUERY: incomplete input. See the query you entered to check for spelling issues:\n" + sql)
         print("\nThanks for using the SQL interpreter! You may enter another request, or enter 'Q' to quit.\n"
               "Reminder, you can always enter 'Help' for assistance with the interface\n")
 
