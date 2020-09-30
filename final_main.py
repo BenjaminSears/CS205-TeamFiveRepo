@@ -74,7 +74,9 @@ def menuOptions():
     # Display options/give user directions
     print("Welcome to the SQL interpreter! If the data is loaded you may input a request. "
           "Your database will be loaded if it does not already exist'.\nYou may input 'Help' for our help menu"
-          "If your session is complete, please enter 'Q' to exit the interface")
+          "\nIf your session is complete, please enter 'Q' to exit the interface"
+          "\n\nREMINDER: please use the corresponding case (upper/lower) for the column the data is representing\n"
+          "For example, ICAO codes should always be capitalized, and if you are searching for 'airline_id', make sure that is how you enter it as input\n")
     if not loadData():
         return "ERROR LOADING DATA"
      # Prompt user for input
@@ -137,7 +139,7 @@ def menuOptions():
             #name, soure_airport_ KZN
 
             #source_airport, icao, GNL
-            if is_join_query and not is_route_query:
+            if is_join_query and not is_route_query and not is_airline_query:
                 if parsedUserRequest[0] in airline_column_list:
                     # if its a string we need qoutes
                     if type(parsedUserRequest[2]) == str:
@@ -233,7 +235,7 @@ def loadData():
     # Load the data from either Route.csv or Airline.csv
     success_load = True
     if path.exists(DATABASE_FILE):
-        print("Data has already been loaded")
+        print("Awesome, your data has already been loaded and your tables have been created")
         return True
 
     else:
